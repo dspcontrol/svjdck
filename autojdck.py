@@ -104,51 +104,12 @@ async def init_web_display():                           #初始化浏览器显�
     except FileNotFoundError:
         print("读取配置文件时出错")
 
-async def init_chrome():        #判断chrome是否存在，不存在则下载，仅针对windows
-    if platform.system() == 'Windows':
-        chrome_dir = os.path.join(os.environ['USERPROFILE'], 'AppData', 'Local', 'pyppeteer', 'pyppeteer', 'local-chromium', '588429', 'chrome-win32')
-        chrome_exe = os.path.join(chrome_dir, 'chrome.exe')
-        chmod_dir = os.path.join(os.environ['USERPROFILE'], 'AppData', 'Local', 'pyppeteer', 'pyppeteer', 'local-chromium', '588429', 'chrome-win32', 'chrome-win32')
-        if os.path.exists(chrome_exe):
-            return
-        else:
-            print('貌似第一次使用，未找到chrome，正在下载chrome浏览器....')
-
-            chromeurl = 'http://npm.taobao.org/mirrors/chromium-browser-snapshots/Win_x64/588429/chrome-win32.zip'        #定义下载地址
-            target_file = 'chrome-win.zip'                                                          #定义下载文件名
-            await download_file(chromeurl, target_file)           #下载
-            with zipfile.ZipFile(target_file, 'r') as zip_ref:
-                zip_ref.extractall(chrome_dir)
-            os.remove(target_file)
-            for item in os.listdir(chmod_dir):              #移动所有文件
-                source_item = os.path.join(chmod_dir, item)
-                destination_item = os.path.join(chrome_dir, item)
-                os.rename(source_item, destination_item)
-            print('解压安装完成')
-            await asyncio.sleep(1)  # 等待1秒，等待
-    elif platform.system() == 'Linux':
+async def init_chrome():        #判断chrome是否存在，linux
+    
+    if platform.system() == 'Linux':
         chrome_path = os.path.expanduser("~/.local/share/pyppeteer/local-chromium/1181205/chrome-linux/chrome")
         download_path = os.path.expanduser("~/.local/share/pyppeteer/local-chromium/1181205/")
-        if os.path.isfile(chrome_path):
-            pass
-        else:
-            print('貌似第一次使用，未找到chrome，正在下载chrome浏览器....')
-            print('文件位于github，请耐心等待，如遇到网络问题可到项目地址手动下载')
-            download_url = "https://github.com/dsmggm/svjdck/releases/download/jdck/chrome-linux.zip"
-            if not os.path.exists(download_path):       #如果没有路径就创建路径
-                os.makedirs(download_path, exist_ok=True)  # 创建下载路径
-            target_file = os.path.join(download_path, 'chrome-linux.zip')  # 定义下载文件路径跟文件名
-            await download_file(download_url, target_file)           #下载
-            with zipfile.ZipFile(target_file, 'r') as zip_ref:
-                zip_ref.extractall(download_path)
-            os.remove(target_file)
-            print('删包')
-            os.chmod(chrome_path, 0o755)
-            print('解压安装完成')
-    elif platform.system() == 'Darwin':
-        return 'mac'
-    else:
-        return 'unknown'
+       
 
 async def initql():        #初始化青龙并获取青龙的token
     global qlip  # 声明这个是全局变量
