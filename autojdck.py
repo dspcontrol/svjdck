@@ -107,8 +107,8 @@ async def init_web_display():                           #初始化浏览器显�
 async def init_chrome():        #判断chrome是否存在，linux
     
     if platform.system() == 'Linux':
-        chrome_path = os.path.expanduser("~/.local/share/pyppeteer/local-chromium/1181205/chrome-linux/chrome")
-        download_path = os.path.expanduser("~/.local/share/pyppeteer/local-chromium/1181205/")
+        chrome_path = os.path.expanduser("/home/kasm-user/Desktop/Google Chrome")
+       
        
 
 async def initql():        #初始化青龙并获取青龙的token
