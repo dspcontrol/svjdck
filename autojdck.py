@@ -412,17 +412,21 @@ async def duanxin(page):   #短信验证函数
             pass
 
 async def verification(page):            #过滑块
-    await page.waitFor(random.randint(100, 2000))      #随机等待1-2秒
-    await page.waitForSelector('#JDJRV-bigimg')
-    image_src = await page.Jeval('#JDJRV-bigimg', 'el => el.getAttribute("src")')  # 获取滑块背景图的地址
-    request.urlretrieve(image_src, 'image.png')  # 下载滑块背景图
+    element = driver.find_element_by_xpath('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[1]/img')
+    base64_string = str(element.get_attribute("src")).split("base64,")[1]
+    image_data = base64.b64decode(base64_string)
+    image = Image.open(io.BytesIO(image_data))
+    image.save("image.png")
     width = await page.evaluate('() => { return document.getElementById("JDJRV-bigimg").clientWidth; }')  #获取网页的图片尺寸
     height = await page.evaluate('() => { return document.getElementById("JDJRV-bigimg").clientHeight; }')   #获取网页的图片尺寸
     image = Image.open('image.png')  #打开图像
     resized_image = image.resize((width, height))# 调整图像尺寸
     resized_image.save('image.png')# 保存调整后的图像
-    template_src = await page.Jeval('#JDJRV-smallimg', 'el => el.getAttribute("src")')  # 获取滑块图片的地址
-    request.urlretrieve(template_src, 'template.png')  # 下载滑块图片
+    element = driver.find_element_by_xpath('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[2]/img')
+    base64_string = str(element.get_attribute("src")).split("base64,")[1]
+    image_data = base64.b64decode(base64_string)
+    image = Image.open(io.BytesIO(image_data))
+    image.save("template.png")
     width = await page.evaluate('() => { return document.getElementById("JDJRV-smallimg").clientWidth; }')  #获取网页的图片尺寸
     height = await page.evaluate('() => { return document.getElementById("JDJRV-smallimg").clientHeight; }')   #获取网页的图片尺寸
     image = Image.open('template.png')  #打开图像
