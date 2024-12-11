@@ -416,6 +416,7 @@ async def duanxin(page):   #短信验证函数
             pass
 
 async def verification(page):            #过滑块
+    await page.waitFor(random.randint(100, 2000))      #随机等待1-2秒
     await page.waitForSelector('#cpc_img')
     image_src = await page.Jeval('#cpc_img', 'el => el.getAttribute("src")')  # 获取滑块背景图的地址
     request.urlretrieve(image_src, 'image.png')  # 下载滑块背景图
