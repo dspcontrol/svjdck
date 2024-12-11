@@ -412,30 +412,33 @@ async def duanxin(page):   #短信验证函数
             pass
 
 async def verification(page):            #过滑块
-    element = driver.find_element_by_xpath('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[1]/img')
-    base64_string = str(element.get_attribute("src")).split("base64,")[1]
-    image_data = base64.b64decode(base64_string)
-    image = Image.open(io.BytesIO(image_data))
-    image.save("./image.png")
-    element = driver.find_element_by_xpath('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[2]/img')
-    base64_string = str(element.get_attribute("src")).split("base64,")[1]
-    image_data = base64.b64decode(base64_string)
-    image = Image.open(io.BytesIO(image_data))
-    image.save("./template.png")
-    distance = int(get_distance('image.png','template.png'))
-    slider = driver.find_element_by_class_name('JDJRV-smallimg')
-    ActionChains(driver).click_and_hold(slider).perform()  # 按住滑块
-    ActionChains(driver).move_by_offset(distance + random.randint(22,23), 0).perform()   # 移动缺口过后
-    time.sleep(random.uniform(0.5,0.8))    # 停留时间
-    for x in generate_list():
-        ActionChains(driver).move_by_offset( - x, 0).perform() # 逆向移动
-        time.sleep(random.uniform(0.1, 0.3))
-    ActionChains(driver).release().perform()   # 释放
-    time.sleep(2)
-def generate_list():
-    lst = random.sample(range(1, 20), random.randint(2, 4))
-    if sum(lst) == 19:
-        return lst
+    await page.waitForSelector('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[1]/img')
+    image_src = await page.Jeval('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[1]/img', 'el => el.getAttribute("src")')  # 获取滑块背景图的地址
+    request.urlretrieve(image_src, 'image.png')  # 下载滑块背景图
+    width = await page.evaluate('() => { return document.getElementByXpath('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[1]/img').clientWidth; }')  #获取网页的图片尺寸
+    height = await page.evaluate('() => { return document.getElementByXpath('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[1]/img').clientHeight; }')   #获取网页的图片尺寸
+    image = Image.open('image.png')  #打开图像
+    resized_image = image.resize((width, height))# 调整图像尺寸
+    resized_image.save('image.png')# 保存调整后的图像
+    template_src = await page.Jeval('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[2]/img', 'el => el.getAttribute("src")')  # 获取滑块图片的地址
+    request.urlretrieve(template_src, 'template.png')  # 下载滑块图片
+    width = await page.evaluate('() => { return document.getElementByXpath('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[2]/img').clientWidth; }')  #获取网页的图片尺寸
+    height = await page.evaluate('() => { return document.getElementByXpath('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[2]/img').clientHeight; }')   #获取网页的图片尺寸
+    image = Image.open('template.png')  #打开图像
+    resized_image = image.resize((width, height))# 调整图像尺寸
+    resized_image.save('template.png')# 保存调整后的图像
+    await page.waitFor(100)  # 等待1秒，确保图片处理完成
+    el = await page.querySelector("#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-slide-bg > div.JDJRV-slide-inner.JDJRV-slide-btn") # 定位到滑块按钮
+    box = await el.boundingBox() #获取滑块按钮信息
+    distance = await get_distance()  # 调用前面定义的get_distance函数计算滑块移动距离
+    await page.mouse.move(box['x'] + 10 , box['y'] + 10)
+    await page.mouse.down()  # 模拟鼠标按下
+    await page.mouse.move(box['x'] + distance + random.uniform(8, 25), box['y'], {'steps': 10})  # 模拟鼠标拖动，考虑到实际操作中可能存在的轻微误差和波动，加入随机偏移量
+    await page.waitFor(random.randint(100, 500))  # 随机等待一段时间，模仿人类操作的不确定性
+    await page.mouse.move(box['x'] + distance, box['y'], {'steps': 10})  # 继续拖动滑块到目标位置
+    await page.mouse.up()  # 模拟鼠标释放，完成滑块拖动
+    await page.waitFor(3000)  # 等待3秒，等待滑块验证结果
+
 async def get_distance(image,template):   #图形处理函数
     bg_img = cv2.imread(image)  # 背景图片
     tp_img = cv2.imread(template)  # 缺口图片
