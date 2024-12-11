@@ -433,10 +433,9 @@ async def verification(page):            #过滑块
     ActionChains(driver).release().perform()   # 释放
     time.sleep(2)
 def generate_list():
-    while True:
-        lst = random.sample(range(1, 20), random.randint(2, 4))
-        if sum(lst) == 19:
-            return lst
+    lst = random.sample(range(1, 20), random.randint(2, 4))
+    if sum(lst) == 19:
+        return lst
 async def get_distance(image,template):   #图形处理函数
     bg_img = cv2.imread(image)  # 背景图片
     tp_img = cv2.imread(template)  # 缺口图片
