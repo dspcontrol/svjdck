@@ -427,13 +427,17 @@ async def verification(page):            #过滑块
     ActionChains(driver).click_and_hold(slider).perform()  # 按住滑块
     ActionChains(driver).move_by_offset(distance + random.randint(22,23), 0).perform()   # 移动缺口过后
     time.sleep(random.uniform(0.5,0.8))    # 停留时间
-        for x in generate_list():
-            ActionChains(driver).move_by_offset( - x, 0).perform() # 逆向移动
-            time.sleep(random.uniform(0.1, 0.3))
-        ActionChains(driver).release().perform()   # 释放
-        time.sleep(2)
-
-async def get_distance():   #图形处理函数
+    for x in generate_list():
+        ActionChains(driver).move_by_offset( - x, 0).perform() # 逆向移动
+        time.sleep(random.uniform(0.1, 0.3))
+    ActionChains(driver).release().perform()   # 释放
+    time.sleep(2)
+def generate_list():
+    while True:
+        lst = random.sample(range(1, 20), random.randint(2, 4))
+        if sum(lst) == 19:
+            return lst
+async def get_distance('image.png','template.png'):   #图形处理函数
     img = cv2.imread('image.png', 0)  # 读取全屏截图，灰度模式
     template = cv2.imread('template.png', 0)  # 读取滑块图片，灰度模式
     img = cv2.GaussianBlur(img, (5, 5), 0)  #图像高斯模糊处理
@@ -445,7 +449,7 @@ async def get_distance():   #图形处理函数
     res = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)  # 使用模板匹配寻找最佳匹配位置
     value = cv2.minMaxLoc(res)[3][0]  # 获取匹配结果的最小值位置，即为滑块起始位置
     distance = value +10 # 计算实际滑动距离，这里根据实际页面比例进行调整
-    return distance
+    return int(distance)
 
 
 async def init_proxy_server():                                             #初始化代理
