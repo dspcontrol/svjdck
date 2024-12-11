@@ -286,7 +286,7 @@ async def validate_login(usernum, passwd, notes):                               
             pass
 
         try:                              #检测是否要过滑块
-            if await page.xpath('//*[@id="small_img"]'):
+            if await page.xpath('//*[@id="JDJRV-smallimg"]'):
                 await verification(page)  #过滑块
         except Exception as e:
             pass
@@ -413,23 +413,23 @@ async def duanxin(page):   #短信验证函数
 
 async def verification(page):            #过滑块
     await page.waitFor(random.randint(100, 2000))      #随机等待1-2秒
-    await page.waitForSelector('#cpc_img')
-    image_src = await page.Jeval('#cpc_img', 'el => el.getAttribute("src")')  # 获取滑块背景图的地址
+    await page.waitForSelector('#JDJRV-bigimg')
+    image_src = await page.Jeval('#JDJRV-bigimg', 'el => el.getAttribute("src")')  # 获取滑块背景图的地址
     request.urlretrieve(image_src, 'image.png')  # 下载滑块背景图
-    width = await page.evaluate('() => { return document.getElementById("cpc_img").clientWidth; }')  #获取网页的图片尺寸
-    height = await page.evaluate('() => { return document.getElementById("cpc_img").clientHeight; }')   #获取网页的图片尺寸
+    width = await page.evaluate('() => { return document.getElementById("JDJRV-bigimg").clientWidth; }')  #获取网页的图片尺寸
+    height = await page.evaluate('() => { return document.getElementById("JDJRV-bigimg").clientHeight; }')   #获取网页的图片尺寸
     image = Image.open('image.png')  #打开图像
     resized_image = image.resize((width, height))# 调整图像尺寸
     resized_image.save('image.png')# 保存调整后的图像
-    template_src = await page.Jeval('#small_img', 'el => el.getAttribute("src")')  # 获取滑块图片的地址
+    template_src = await page.Jeval('#JDJRV-smallimg', 'el => el.getAttribute("src")')  # 获取滑块图片的地址
     request.urlretrieve(template_src, 'template.png')  # 下载滑块图片
-    width = await page.evaluate('() => { return document.getElementById("small_img").clientWidth; }')  #获取网页的图片尺寸
-    height = await page.evaluate('() => { return document.getElementById("small_img").clientHeight; }')   #获取网页的图片尺寸
+    width = await page.evaluate('() => { return document.getElementById("JDJRV-smallimg").clientWidth; }')  #获取网页的图片尺寸
+    height = await page.evaluate('() => { return document.getElementById("JDJRV-smallimg").clientHeight; }')   #获取网页的图片尺寸
     image = Image.open('template.png')  #打开图像
     resized_image = image.resize((width, height))# 调整图像尺寸
     resized_image.save('template.png')# 保存调整后的图像
     await page.waitFor(100)  # 等待1秒，确保图片处理完成
-    el = await page.querySelector("#captcha_modal > div > div.captcha_footer > div > img") # 定位到滑块按钮
+    el = await page.querySelector("#JDJRV-wrap-loginsubmit > div > div.JDJRV-slide-bg > div.JDJRV-slide-btn") # 定位到滑块按钮
     box = await el.boundingBox() #获取滑块按钮信息
     distance = await get_distance()  # 调用前面定义的get_distance函数计算滑块移动距离
     await page.mouse.move(box['x'] + 10 , box['y'] + 10)
