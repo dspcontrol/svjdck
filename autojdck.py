@@ -244,9 +244,7 @@ async def validate_logon(usernum, passwd, notes):                               
         'headless': WebDisplay,  # 设置为非无头模式，即可视化浏览器界面
         'args': asgs,
     })
-
-asyncio.get_event_loop().run_until_complete(main())
-    browser = await launch(headless=False, args=['--disable-infobars'])
+    asyncio.get_event_loop().run_until_complete(main())
     page = await browser.newPage()  # 打开新页面
     await page.setViewport({'width': 360, 'height': 640})  # 设置视窗大小
     await page.goto('https://plogin.m.jd.com/login/login?appid=300&returnurl=https%3A%2F%2Fm.jd.com%2F&source=wq_passport')  # 访问京东登录页面
