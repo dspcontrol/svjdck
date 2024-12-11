@@ -203,7 +203,7 @@ notify.sendNotify(`JDCK登录验证通知`, message)
 
 
 
-async def logon_main():             #读取配置文件账户密码，登录
+async def login_main():             #读取配置文件账户密码，登录
     global qltoken   #初始化青龙获取青龙ck
     qltoken = await initql()      #初始化青龙token
     global envs               #青龙环境全局变量
@@ -218,7 +218,7 @@ async def logon_main():             #读取配置文件账户密码，登录
             if len(userdata) == 3:   #分为三段，如果不满足3段，则跳过此行
                 usernum, passwd, notes= userdata     # 解包列表到四个变量，并按照指定格式打印
                 if notes not in notess:        # 判断是否不存在 "notes" 在 notess 中
-                    await validate_logon(usernum, passwd, notes)   #登录
+                    await validate_login(usernum, passwd, notes)   #登录
 
 async def get_user_choice():            #短信验证选择
     choice = None
@@ -238,7 +238,7 @@ async def get_user_choice():            #短信验证选择
             print("发生错误：", e)
     return choice
 
-async def validate_logon(usernum, passwd, notes):                                         #登录操作
+async def validate_login(usernum, passwd, notes):                                         #登录操作
     print(f"正在登录 {notes} {usernum} 的账号")
     browser = await launch({
         'headless': WebDisplay,  # 设置为非无头模式，即可视化浏览器界面
@@ -248,7 +248,7 @@ async def validate_logon(usernum, passwd, notes):                               
     await page.evaluate(
         '''() =>{ Object.defineProperties(navigator,{ webdriver:{ get: () => false } }) }''')
     await page.setViewport({'width': 360, 'height': 640})  # 设置视窗大小
-    await page.goto('https://plogin.m.jd.com/login/login?appid=300&returnurl=https%3A%2F%2Fwq.jd.com%2Fpassport%2FLoginRedirect%3Fstate%3D419216172_110454539_286841_2677444%26returnurl%3Dhttps%253A%252F%252Fmy.m.jd.com%252F&source=wq_passport')  # 访问京东登录页面
+    await page.goto('https://passport.jd.com/new/login.aspx?ReturnUrl=https%3A%2F%2Fhome.jd.com%2F')  # 访问京东登录页面
     await typeuser(page, usernum, passwd)        #进行账号密码登录
     should_break = False  #定义下面不停循环
     while True:
@@ -304,14 +304,10 @@ async def validate_logon(usernum, passwd, notes):                               
             break
 
 async def typeuser(page, usernum, passwd):         #输入账户密码
-    await page.waitForSelector('.J_ping.planBLogin')  # 等待元素出现
-    await page.click('.J_ping.planBLogin')  # 点击密码登录
-    await page.type('#username', usernum, {'delay': random.randint(60, 121)})  # 输入用户名，模拟键盘输入延迟
-    await page.type('#pwd', passwd, {'delay': random.randint(100, 151)})  # 输入密码，模拟键盘输入延迟
+    await page.type('#loginname', usernum, {'delay': random.randint(60, 121)})  # 输入用户名，模拟键盘输入延迟
+    await page.type('#nloginpwd', passwd, {'delay': random.randint(100, 151)})  # 输入密码，模拟键盘输入延迟
     await page.waitFor(random.randint(100, 2000))      #随机等待1-2秒
-    await page.click('.policy_tip-checkbox')  # 点击同意
-    await page.waitFor(random.randint(100, 2000))      #随机等待1-2秒
-    await page.click('.btn.J_ping.btn-active')  # 点击登录按钮
+    await page.click('#loginsubmit')  # 点击登录按钮
     await page.waitFor(random.randint(100, 2000))      #随机等待1-2秒
 async def SubmitCK(page, notes):  #提交ck
     cookies = await page.cookies()                             #设置cookeis变量，用于下面的搜索
@@ -494,7 +490,7 @@ async def main():  # 打开并读取配置文件，主程序
     await get_latest_version()       #获取最新版本
     await ifconfigfile()    #检测配置文件并初始化
     await init_chrome()     #检测初始化chrome
-    await logon_main()    #登录操作，写入ck到文件
+    await login_main()    #登录操作，写入ck到文件
     os.remove('image.png') if os.path.exists('image.png') else None     #删除缓存照片
     os.remove('template.png') if os.path.exists('template.png') else None     #删除缓存照片
     await print_message('完成全部登录')
