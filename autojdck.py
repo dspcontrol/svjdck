@@ -437,20 +437,14 @@ def generate_list():
         lst = random.sample(range(1, 20), random.randint(2, 4))
         if sum(lst) == 19:
             return lst
-async def get_distance('image.png','template.png'):   #图形处理函数
-    img = cv2.imread('image.png', 0)  # 读取全屏截图，灰度模式
-    template = cv2.imread('template.png', 0)  # 读取滑块图片，灰度模式
-    img = cv2.GaussianBlur(img, (5, 5), 0)  #图像高斯模糊处理
-    template = cv2.GaussianBlur(template, (5, 5), 0)  #图像高斯模糊处理
-    bg_edge = cv2.Canny(img, 100, 200)  #识别边缘
-    cut_edge = cv2.Canny(template, 100, 200) #识别边缘
-    img = cv2.cvtColor(bg_edge, cv2.COLOR_GRAY2RGB)  #转换图片格式，不知道是啥
-    template = cv2.cvtColor(cut_edge, cv2.COLOR_GRAY2RGB) #转换图片格式，不知道是啥
-    res = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)  # 使用模板匹配寻找最佳匹配位置
-    value = cv2.minMaxLoc(res)[3][0]  # 获取匹配结果的最小值位置，即为滑块起始位置
-    distance = value +10 # 计算实际滑动距离，这里根据实际页面比例进行调整
+async def get_distance(image,template):   #图形处理函数
+    bg_img = cv2.imread(image)  # 背景图片
+    tp_img = cv2.imread(template)  # 缺口图片
+    # 缺口匹配
+    res = cv2.matchTemplate(bg_img, tp_img, cv2.TM_CCOEFF_NORMED)
+    value = cv2.minMaxLoc(res)[2][0]
+    distance = value * 278 / 360
     return int(distance)
-
 
 async def init_proxy_server():                                             #初始化代理
     if proxy_server:                 #如果有配置代理
