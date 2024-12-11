@@ -248,7 +248,8 @@ async def validate_logon(usernum, passwd, notes):                               
     await page.evaluate(
         '''() =>{ Object.defineProperties(navigator,{ webdriver:{ get: () => false } }) }''')
     await page.setViewport({'width': 360, 'height': 640})  # 设置视窗大小
-    await page.goto('https://plogin.m.jd.com/login/login?appid=300&returnurl=https%3A%2F%2Fm.jd.com%2F&source=wq_passport')  # 访问京东登录页面
+    await page.goto('https://plogin.m.jd.com/login/login?appid=300&returnurl=https%3A%2F%2Fwq.jd.com%2Fpassport%2FLoginRedirect%3Fstate%3D419216172_110454539_286841_2677444%26returnurl%3Dhttps%253A%252F%252Fmy.m.jd.com%252F&source=wq_passport
+')  # 访问京东登录页面
     await typeuser(page, usernum, passwd)        #进行账号密码登录
     should_break = False  #定义下面不停循环
     while True:
