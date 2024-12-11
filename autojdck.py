@@ -244,14 +244,12 @@ async def validate_logon(usernum, passwd, notes):                               
         'headless': WebDisplay,  # 设置为非无头模式，即可视化浏览器界面
         'args': asgs,
     })
-    asyncio.get_event_loop().run_until_complete(main())
     page = await browser.newPage()  # 打开新页面
     await page.setViewport({'width': 360, 'height': 640})  # 设置视窗大小
     await page.goto('https://plogin.m.jd.com/login/login?appid=300&returnurl=https%3A%2F%2Fm.jd.com%2F&source=wq_passport')  # 访问京东登录页面
     await page.evaluate(
         '''() =>{ Object.defineProperties(navigator,{ webdriver:{ get: () => false } }) }''')
     await typeuser(page, usernum, passwd)        #进行账号密码登录
-    await asyncio.sleep(100)
     should_break = False  #定义下面不停循环
     while True:
         try:                              #找ck
