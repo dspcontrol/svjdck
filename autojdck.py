@@ -247,7 +247,7 @@ async def validate_login(usernum, passwd, notes):                               
     page = await browser.newPage()  # 打开新页面
     await page.evaluate(
         '''() =>{ Object.defineProperties(navigator,{ webdriver:{ get: () => false } }) }''')
-    await page.setViewport({'width': 360, 'height': 640})  # 设置视窗大小
+    await page.setViewport({'width': 1377, 'height': 789})  # 设置视窗大小
     await page.goto('https://passport.jd.com/new/login.aspx?ReturnUrl=https%3A%2F%2Fhome.jd.com%2F')  # 访问京东登录页面
     await typeuser(page, usernum, passwd)        #进行账号密码登录
     should_break = False  #定义下面不停循环
