@@ -247,8 +247,6 @@ async def validate_logon(usernum, passwd, notes):                               
     page = await browser.newPage()  # 打开新页面
     await page.setViewport({'width': 360, 'height': 640})  # 设置视窗大小
     await page.goto('https://plogin.m.jd.com/login/login?appid=300&returnurl=https%3A%2F%2Fm.jd.com%2F&source=wq_passport')  # 访问京东登录页面
-    await page.evaluate(
-        '''() =>{ Object.defineProperties(navigator,{ webdriver:{ get: () => false } }) }''')
     await typeuser(page, usernum, passwd)        #进行账号密码登录
     should_break = False  #定义下面不停循环
     while True:
@@ -416,6 +414,8 @@ async def duanxin(page):   #短信验证函数
             pass
 
 async def verification(page):            #过滑块
+    await page.evaluate(
+        '''() =>{ Object.defineProperties(navigator,{ webdriver:{ get: () => false } }) }''')
     await page.waitForSelector('#cpc_img')
     image_src = await page.Jeval('#cpc_img', 'el => el.getAttribute("src")')  # 获取滑块背景图的地址
     request.urlretrieve(image_src, 'image.png')  # 下载滑块背景图
