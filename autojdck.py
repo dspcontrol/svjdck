@@ -429,7 +429,7 @@ async def verification(page):            #过滑块
     resized_image = image.resize((width, height))# 调整图像尺寸
     resized_image.save('template.png')# 保存调整后的图像
     await page.waitFor(100)  # 等待1秒，确保图片处理完成
-    el = await page.querySelector("#JDJRV-wrap-loginsubmit > div > div.JDJRV-slide-bg > div.JDJRV-slide-btn") # 定位到滑块按钮
+    el = await page.querySelector("#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-slide-bg > div.JDJRV-slide-inner.JDJRV-slide-btn") # 定位到滑块按钮 JS路径
     box = await el.boundingBox() #获取滑块按钮信息
     distance = await get_distance()  # 调用前面定义的get_distance函数计算滑块移动距离
     await page.mouse.move(box['x'] + 10 , box['y'] + 10)
@@ -451,7 +451,7 @@ async def get_distance():   #图形处理函数
     template = cv2.cvtColor(cut_edge, cv2.COLOR_GRAY2RGB) #转换图片格式，不知道是啥
     res = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)  # 使用模板匹配寻找最佳匹配位置
     value = cv2.minMaxLoc(res)[3][0]  # 获取匹配结果的最小值位置，即为滑块起始位置
-    distance = value * 278 / 360 # 计算实际滑动距离，这里根据实际页面比例进行调整
+    distance = value +10 # 计算实际滑动距离，这里根据实际页面比例进行调整
     return distance
 
 
