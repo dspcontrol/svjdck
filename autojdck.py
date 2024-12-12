@@ -414,15 +414,15 @@ async def verification(page):            #过滑块
     await page.waitForSelector('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-bigimg > img')
     image_src = await page.Jeval('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-bigimg > img', 'el => el.getAttribute("src")')  # 获取滑块背景图的地址
     request.urlretrieve(image_src, 'image.png')  # 下载滑块背景图
-    width = await page.evaluate('() => { return document.querySelector('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-bigimg > img').clientWidth; }')  #获取网页的图片尺寸
-    height = await page.evaluate('() => { return document.querySelector('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-bigimg > img').clientHeight; }')   #获取网页的图片尺寸
+    width = await page.evaluate('() => { return document.querySelector("#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-bigimg > img").clientWidth; }')  #获取网页的图片尺寸
+    height = await page.evaluate('() => { return document.querySelector("#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-bigimg > img").clientHeight; }')   #获取网页的图片尺寸
     image = Image.open('image.png')  #打开图像
     resized_image = image.resize((width, height))# 调整图像尺寸
     resized_image.save('image.png')# 保存调整后的图像
     template_src = await page.Jeval('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-smallimg > img', 'el => el.getAttribute("src")')  # 获取滑块图片的地址
     request.urlretrieve(template_src, 'template.png')  # 下载滑块图片
-    width = await page.evaluate('() => { return document.querySelector("#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-smallimg > img').clientWidth; }')  #获取网页的图片尺寸
-    height = await page.evaluate('() => { return document.querySelector('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-smallimg > img').clientHeight; }')   #获取网页的图片尺寸
+    width = await page.evaluate('() => { return document.querySelector("#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-smallimg > img").clientWidth; }')  #获取网页的图片尺寸
+    height = await page.evaluate('() => { return document.querySelector("#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-smallimg > img").clientHeight; }')   #获取网页的图片尺寸
     image = Image.open('template.png')  #打开图像
     resized_image = image.resize((width, height))# 调整图像尺寸
     resized_image.save('template.png')# 保存调整后的图像
