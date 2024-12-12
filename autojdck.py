@@ -410,43 +410,47 @@ async def duanxin(page):   #短信验证函数
             await page.waitFor(random.randint(2, 3) * 1000)      #随机等待2-3秒
         except Exception as e:
             pass
-def verification()
-        element = driver.find_element_by_xpath('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[1]/img')
-        base64_string = str(element.get_attribute("src")).split("base64,")[1]
-        image_data = base64.b64decode(base64_string)
-        image = Image.open(io.BytesIO(image_data))
-        image.save("./bg.png")
-        # 滑块图片
-        element = driver.find_element_by_xpath('//*[@id="JDJRV-wrap-loginsubmit"]/div/div/div/div[1]/div[2]/div[2]/img')
-        base64_string = str(element.get_attribute("src")).split("base64,")[1]
-        image_data = base64.b64decode(base64_string)
-        image = Image.open(io.BytesIO(image_data))
-        image.save("./tp.png")
+async def verification(page):            #过滑块
+    await page.waitForSelector('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-bigimg > img')
+    image_src = await page.Jeval('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-bigimg > img', 'el => el.getAttribute("src")')  # 获取滑块背景图的地址
+    request.urlretrieve(image_src, 'image.png')  # 下载滑块背景图
+    width = await page.evaluate('() => { return document.querySelector('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-bigimg > img').clientWidth; }')  #获取网页的图片尺寸
+    height = await page.evaluate('() => { return document.querySelector('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-bigimg > img').clientHeight; }')   #获取网页的图片尺寸
+    image = Image.open('image.png')  #打开图像
+    resized_image = image.resize((width, height))# 调整图像尺寸
+    resized_image.save('image.png')# 保存调整后的图像
+    template_src = await page.Jeval('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-smallimg > img', 'el => el.getAttribute("src")')  # 获取滑块图片的地址
+    request.urlretrieve(template_src, 'template.png')  # 下载滑块图片
+    width = await page.evaluate('() => { return document.querySelector("#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-smallimg > img').clientWidth; }')  #获取网页的图片尺寸
+    height = await page.evaluate('() => { return document.querySelector('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-img-panel.JDJRV-click-bind-suspend > div.JDJRV-img-wrap > div.JDJRV-smallimg > img').clientHeight; }')   #获取网页的图片尺寸
+    image = Image.open('template.png')  #打开图像
+    resized_image = image.resize((width, height))# 调整图像尺寸
+    resized_image.save('template.png')# 保存调整后的图像
+    await page.waitFor(100)  # 等待1秒，确保图片处理完成
+    el = await page.querySelecto('#JDJRV-wrap-loginsubmit > div > div > div > div.JDJRV-slide-bg > div.JDJRV-slide-inner.JDJRV-slide-btn') # 定位到滑块按钮
+    box = await el.boundingBox() #获取滑块按钮信息
+    distance = await get_distance()  # 调用前面定义的get_distance函数计算滑块移动距离
+    await page.mouse.move(box['x'] + 10 , box['y'] + 10)
+    await page.mouse.down()  # 模拟鼠标按下
+    await page.mouse.move(box['x'] + distance + random.uniform(8, 25), box['y'], {'steps': 10})  # 模拟鼠标拖动，考虑到实际操作中可能存在的轻微误差和波动，加入随机偏移量
+    await page.waitFor(random.randint(100, 500))  # 随机等待一段时间，模仿人类操作的不确定性
+    await page.mouse.move(box['x'] + distance, box['y'], {'steps': 10})  # 继续拖动滑块到目标位置
+    await page.mouse.up()  # 模拟鼠标释放，完成滑块拖动
+    await page.waitFor(3000)  # 等待3秒，等待滑块验证结果
 
-        # 计算滑块的距离
-        distance = int(get_distance('bg.png','tp.png'))
-        slider = driver.find_element_by_class_name('JDJRV-smallimg')
-        ActionChains(driver).click_and_hold(slider).perform()  # 按住滑块
-        ActionChains(driver).move_by_offset(distance + random.randint(22,23), 0).perform()   # 移动缺口过后
-        time.sleep(random.uniform(0.5,0.8))    # 停留时间
-        for x in generate_list():
-            ActionChains(driver).move_by_offset( - x, 0).perform() # 逆向移动
-            time.sleep(random.uniform(0.1, 0.3))
-        ActionChains(driver).release().perform()   # 释放
-        time.sleep(2)
-def get_distance(bg, tp):   #图形处理函数
-    bg_img = cv2.imread(image)  # 背景图片
-    tp_img = cv2.imread(template)  # 缺口图片
-    # 缺口匹配
-    res = cv2.matchTemplate(bg_img, tp_img, cv2.TM_CCOEFF_NORMED)
-    value = cv2.minMaxLoc(res)[2][0]
-    distance = value * 278 / 360
-    return int(distance)
-def generate_list():
-    while True:
-        lst = random.sample(range(1, 20), random.randint(2, 4))
-        if sum(lst) == 19:
-            return lst
+async def get_distance():   #图形处理函数
+    img = cv2.imread('image.png', 0)  # 读取全屏截图，灰度模式
+    template = cv2.imread('template.png', 0)  # 读取滑块图片，灰度模式
+    img = cv2.GaussianBlur(img, (5, 5), 0)  #图像高斯模糊处理
+    template = cv2.GaussianBlur(template, (5, 5), 0)  #图像高斯模糊处理
+    bg_edge = cv2.Canny(img, 100, 200)  #识别边缘
+    cut_edge = cv2.Canny(template, 100, 200) #识别边缘
+    img = cv2.cvtColor(bg_edge, cv2.COLOR_GRAY2RGB)  #转换图片格式，不知道是啥
+    template = cv2.cvtColor(cut_edge, cv2.COLOR_GRAY2RGB) #转换图片格式，不知道是啥
+    res = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)  # 使用模板匹配寻找最佳匹配位置
+    value = cv2.minMaxLoc(res)[3][0]  # 获取匹配结果的最小值位置，即为滑块起始位置
+    distance = value + 10 # 计算实际滑动距离，这里根据实际页面比例进行调整，+10像素校准算法这傻逼玩意
+    return distance
 
 async def init_proxy_server():                                             #初始化代理
     if proxy_server:                 #如果有配置代理
